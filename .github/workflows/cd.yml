@@ -18,12 +18,7 @@ env:
     AWS_ROLE:  ${{ secret.AWS_ACTION_ROLE}}  
     ECR_REPO_NAME: dev            # set this to your preferred AWS region, e.g. us-west-1
     IMAGE_TAG: ${{github.run_number}}
-    # ECR_REPOSITORY: ecr-project-repo          # set this to your Amazon ECR repository name
-    # ECS_SERVICE: project_service               # set this to your Amazon ECS service name
-    # ECS_CLUSTER: project_cluster                 # set this to your Amazon ECS cluster name
-    # ECS_TASK_DEFINITION: .github/workflows/td.json # set this to the path to your Amazon ECS task definition
-    #                                            # file, e.g. .aws/task-definition.json
-    # CONTAINER_NAME: project  
+    
 
 jobs:
     build:
@@ -43,12 +38,25 @@ jobs:
           - name: login to ecr
             uses: aws-actions/amazon-ecr-login@v1
             id: ecr-login
-          - name: build tag and push image
+          - name: build and tag image
             id: build-and-push
             run: |
                 # docker build -t ecr-registry/ecr-repository:image_tag
                 docker build -t ${ steps.ecr-login.outputs.registry }/${{ env.ECR_REPO_NAME}}:${{ env. IMAGE_TAG}} .
-                docker push ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPO_NAME}}:${{ env. IMAGE_TAG}}
+               
+          - name: scan the image using trivy for vulnerabilities
+            uses: aquasecurity/trivy-action@master
+            with:
+              image-ref: "${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPO_NAME}}"  # Scans the built image
+              format: "table"
+              exit-code: "1"
+              severity: "CRITICAL,HIGH"
+
+
+
+          - name: push image to ecr
+            run:  docker push ${{ steps.ecr-login.outputs.registry }}/${{ env.ECR_REPO_NAME}}:${{ env. IMAGE_TAG}}
+ 
 
 
 
