@@ -1,23 +1,27 @@
 name: buil push and deploy image
 
 on:
-    workflow_dispatch:
+    #workflow_dispatch:
       
-    # push:
-    #   branches:
-    #     - "main"
-    # pull_request:
-    #   branches: [main]
+    push:
+      branches:
+        - "main"
+    pull_request:
+      branches: [main]
+
+permissions:
+    id-token: write
+    contents: read
 
 env:
     AWS_REGION: us-east-1
     AWS_ROLE:  ${{ secret.AWS_ACTION_ROLE}}                 # set this to your preferred AWS region, e.g. us-west-1
-    ECR_REPOSITORY: ecr-project-repo          # set this to your Amazon ECR repository name
-    ECS_SERVICE: project_service               # set this to your Amazon ECS service name
-    ECS_CLUSTER: project_cluster                 # set this to your Amazon ECS cluster name
-    ECS_TASK_DEFINITION: .github/workflows/td.json # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
-    CONTAINER_NAME: project  
+    # ECR_REPOSITORY: ecr-project-repo          # set this to your Amazon ECR repository name
+    # ECS_SERVICE: project_service               # set this to your Amazon ECS service name
+    # ECS_CLUSTER: project_cluster                 # set this to your Amazon ECS cluster name
+    # ECS_TASK_DEFINITION: .github/workflows/td.json # set this to the path to your Amazon ECS task definition
+    #                                            # file, e.g. .aws/task-definition.json
+    # CONTAINER_NAME: project  
 
 jobs:
     build:
