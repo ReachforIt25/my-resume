@@ -1,7 +1,6 @@
 name: buil push and deploy image
 
 on:
-    #workflow_dispatch:
       
     push:
       branches:
