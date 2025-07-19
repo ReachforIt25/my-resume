@@ -1,0 +1,48 @@
+name: buil push and deploy image
+
+on:
+    workflow_dispatch:
+      
+    # push:
+    #   branches:
+    #     - "main"
+    # pull_request:
+    #   branches: [main]
+
+env:
+    AWS_REGION: us-east-1
+    AWS_ROLE:  ${{ secret.AWS_ACTION_ROLE}}                 # set this to your preferred AWS region, e.g. us-west-1
+    ECR_REPOSITORY: ecr-project-repo          # set this to your Amazon ECR repository name
+    ECS_SERVICE: project_service               # set this to your Amazon ECS service name
+    ECS_CLUSTER: project_cluster                 # set this to your Amazon ECS cluster name
+    ECS_TASK_DEFINITION: .github/workflows/td.json # set this to the path to your Amazon ECS task definition
+                                               # file, e.g. .aws/task-definition.json
+    CONTAINER_NAME: project  
+
+jobs:
+    build:
+        runs-on: ubuntu-latest   # this is a shared runner / github runner
+        steps:
+          - name: clone repo
+            uses: actions/checkout@v3
+
+          - name: Configure AWS credentials
+            uses: aws-actions/configure-aws-credentials@v1
+            with:
+              # aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}                  we can either use aws access key and secret key or use ROLE for security measures.
+              # aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+              role-to-assume: ${{env.AWS_ROLE}} # OICD 
+              aws-region: ${{ env.AWS_REGION }}
+
+          - name: login to ecr
+            uses: aws-actions/amazon-ecr-login@v1
+
+
+
+  
+
+
+
+
+
+
